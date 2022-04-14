@@ -1,0 +1,5 @@
+{
+    "engine": "csv",
+    "filename": "%Y-%m.csv",
+    "columns": []
+}
