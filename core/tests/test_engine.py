@@ -1,10 +1,11 @@
 import unittest
+from datetime import date
 from pathlib import Path
 
 from core import Config, Engine, CsvEngine
 
-
 TEST_FILE = 'core/tests/_test.csv'
+TEST_FILE_DATETIME = 'core/tests/_%Y.csv'
 
 
 class TestEngine(unittest.TestCase):
@@ -48,3 +49,19 @@ class TestEngine(unittest.TestCase):
                 ],
             )
 
+    def test_datetime_filename(self):
+        config = Config({
+            'engine': 'csv',
+            'filename': TEST_FILE_DATETIME,
+            'columns': [
+                {'name': 'A', 'type': 'str'},
+            ]
+        })
+        engine = Engine.from_config(config)
+        engine.write({'A': 'a'})
+
+        self.assertTrue(
+            Path(TEST_FILE_DATETIME)
+                .with_name(f'_{date.today().year}.csv')
+                .exists()
+        )

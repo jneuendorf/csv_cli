@@ -1,5 +1,6 @@
 import csv
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,9 @@ class Engine(ABC):
         else:
             raise ValueError(f'invalid engine "{engine}"')
 
+    def get_filename(self) -> str:
+        return datetime.now().strftime(self.config.filename)
+
     @abstractmethod
     def write(self, record: dict[str, Any]) -> None:
         ...
@@ -32,7 +36,7 @@ class Engine(ABC):
 class CsvEngine(Engine):
 
     def write(self, record: dict[str, Any]):
-        path = Path(self.config.filename).resolve()
+        path = Path(self.get_filename()).resolve()
         if path.exists():
             with path.open(mode='a') as file:
                 writer = csv.DictWriter(file, fieldnames=self.config.column_names)
