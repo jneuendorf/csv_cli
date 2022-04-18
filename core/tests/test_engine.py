@@ -49,6 +49,32 @@ class TestEngine(unittest.TestCase):
                 ],
             )
 
+    def test_eval_column(self):
+        config = Config({
+            'engine': 'csv',
+            'filename': TEST_FILE,
+            'columns': [
+                {'name': 'A', 'type': 'str'},
+                {'name': 'B', 'type': 'int', 'eval': 'r["D"] * 2'},
+                {'name': 'C', 'type': 'str', 'eval': 'date.today()'},
+                {'name': 'D', 'type': 'int'},
+            ]
+        })
+        engine = Engine.from_config(config)
+        engine.write({
+            'A': 'a',
+            'D': 3,
+        })
+
+        with open(TEST_FILE) as test_file:
+            self.assertEqual(
+                [line.strip() for line in test_file.readlines()],
+                [
+                    'A,B,C,D',
+                    f'a,6,{date.today()},3',
+                ],
+            )
+
     def test_datetime_filename(self):
         config = Config({
             'engine': 'csv',

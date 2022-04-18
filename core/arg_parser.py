@@ -24,7 +24,7 @@ class ArgParser:
     def add_arguments(self):
         for column in self.config.columns:
             self.parser.add_argument(
-                column['name'],
+                column.name,
                 type=self.config.get_column_type(column),
             )
 

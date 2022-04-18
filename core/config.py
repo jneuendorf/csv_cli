@@ -7,12 +7,30 @@ from typing import TypedDict, Literal, Any
 class ColumnDict(TypedDict):
     name: str
     type: Literal['str', 'int', 'float']
+    eval: str
 
 
 class ConfigDict(TypedDict):
     engine: Literal['csv', 'json']
     filename: str
     columns: list[ColumnDict]
+
+
+class Column:
+    name: str
+    type: Literal['str', 'int', 'float']
+    eval: str | None
+
+    def __init__(self, column_dict: ColumnDict):
+        self.name = column_dict['name']
+        self.type = column_dict['type']
+        if 'eval' not in column_dict or column_dict['eval'] is None:
+            self.eval = None
+        else:
+            self.eval = column_dict['eval']
+
+    def __repr__(self):
+        return f'<Column name={self.name} type={self.type} eval={self.eval}>'
 
 
 class Config:
@@ -52,21 +70,20 @@ class Config:
         return self._config['filename']
 
     @property
-    def columns(self) -> list[ColumnDict]:
-        return self._config['columns']
+    def columns(self) -> list[Column]:
+        return [Column(col) for col in self._config['columns']]
 
     @property
     def column_names(self) -> list[str]:
-        return [col['name'] for col in self.columns]
+        return [col.name for col in self.columns]
 
     @staticmethod
-    def get_column_type(column: ColumnDict) -> Callable[[str], Any]:
-        col_type = column['type']
-        if col_type == 'str':
+    def get_column_type(column: Column) -> Callable[[str], Any]:
+        if column.type == 'str':
             return str
-        elif col_type == 'int':
+        elif column.type == 'int':
             return int
-        elif col_type == 'float':
+        elif column.type == 'float':
             return float
         else:
-            raise ValueError(f'invalid column type "{col_type}"')
+            raise ValueError(f'invalid column type "{column.type}"')
