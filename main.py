@@ -1,6 +1,10 @@
-from core import Config, ArgParser
+from core import Config, ArgParser, Engine
 
 if __name__ == '__main__':
-    parser = ArgParser(Config())
-    parser.add_arguments()
-    args = parser.parse_args(['asdf', '1', '2.0', '1'])
+    config = Config()
+    parser = ArgParser.from_config(config)
+    engine = Engine.from_config(config)
+    record = parser.parse_args()
+    # print('parsed args:', record)
+    engine.write(record)
+

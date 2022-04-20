@@ -17,8 +17,7 @@ class TestArgParser(unittest.TestCase):
             ]
         })
 
-        parser = ArgParser(config)
-        parser.add_arguments()
+        parser = ArgParser.from_config(config)
         args = parser.parse_args(['asdf', '1', '2.0', '1'])
 
         self.assertEqual(args, {

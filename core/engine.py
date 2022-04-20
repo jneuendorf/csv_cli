@@ -44,25 +44,32 @@ class Engine(ABC):
 
     def write(self, record: dict[str, Any]) -> None:
         path = Path(self.get_filename()).resolve()
-        return self._write(
-            record=self.fill_eval_columns(record),
-            path=path,
-        )
+        record = self.fill_eval_columns(record)
+        if path.exists() and path.read_text().strip() != '':
+            print('appending')
+            self.append(record, path)
+        else:
+            print('overwriting')
+            self.overwrite(record, path)
 
     @abstractmethod
-    def _write(self, record: dict[str, Any], path: Path) -> None:
+    def append(self, record: dict[str, Any], path: Path) -> None:
+        ...
+
+    @abstractmethod
+    def overwrite(self, record: dict[str, Any], path: Path) -> None:
         ...
 
 
 class CsvEngine(Engine):
 
-    def _write(self, record: dict[str, Any], path: Path):
-        if path.exists():
-            with path.open(mode='a') as file:
-                writer = csv.DictWriter(file, fieldnames=self.config.column_names)
-                writer.writerow(record)
-        else:
-            with path.open(mode='w') as file:
-                writer = csv.DictWriter(file, fieldnames=self.config.column_names)
-                writer.writeheader()
-                writer.writerow(record)
+    def append(self, record: dict[str, Any], path: Path) -> None:
+        with path.open(mode='a') as file:
+            writer = csv.DictWriter(file, fieldnames=self.config.column_names)
+            writer.writerow(record)
+
+    def overwrite(self, record: dict[str, Any], path: Path) -> None:
+        with path.open(mode='w') as file:
+            writer = csv.DictWriter(file, fieldnames=self.config.column_names)
+            writer.writeheader()
+            writer.writerow(record)

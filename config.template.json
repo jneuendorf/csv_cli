@@ -1,5 +1,15 @@
 {
     "engine": "csv",
-    "filename": "%Y-%m.csv",
-    "columns": []
+    "filename": "template.csv",
+    "columns": [
+        {
+            "name": "date",
+            "type": "str",
+            "eval": "date.today().strftime('%y-%m-%d')"
+        },
+        {
+            "name": "value",
+            "type": "int"
+        }
+    ]
 }

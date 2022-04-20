@@ -23,10 +23,12 @@ class ArgParser:
 
     def add_arguments(self):
         for column in self.config.columns:
-            self.parser.add_argument(
-                column.name,
-                type=self.config.get_column_type(column),
-            )
+            if column.eval is None:
+                # print('adding cli arg for', column)
+                self.parser.add_argument(
+                    column.name,
+                    type=self.config.get_column_type(column),
+                )
 
     def parse_args(self, args: Sequence[str] = None) -> dict[str, Any]:
         return vars(self.parser.parse_args(args))
